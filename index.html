@@ -28,6 +28,8 @@
     <input id="btnSearch" onclick="searchImmun()" type="button" value="Search Immunization" />
     &nbsp;&nbsp;&nbsp;&nbsp;
     <input id="btnCreate" onclick="createDocument()" type="button" value="Create Immunization Certificate" disabled/>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input id="btnCreateRes" onclick="createResource()" type="button" value="Create Organization / Patient /  Certificate"/>
 <br><br>
     <table id ="myTable">
         <tr>
@@ -46,13 +48,13 @@
         </tr>
         <tr>
             <td>
-                <textarea id="taImmun" name="S1"></textarea>
+                <textarea id="taImmun" name="S1" readonly></textarea>
             </td>
             <td>
-                <textarea id="taPatient" name="S1"></textarea>
+                <textarea id="taPatient" name="S1" readonly></textarea>
             </td>
             <td>
-                <textarea id="taOrg" name="S1"></textarea>
+                <textarea id="taOrg" name="S1" readonly></textarea>
             </td>
         </tr>
         <tr>
@@ -67,16 +69,25 @@
         </tr>
         <tr>
             <td>
-                <textarea id="taComp" name="S1"></textarea>
+                <textarea id="taComp" name="S1" readonly></textarea>
             </td>
             <td>
-                <textarea id="taDoc" name="S1"></textarea>
+                <textarea id="taDoc" name="S1" readonly></textarea>
             </td>
         </tr>
     </table>
 
     <script>
         var allowCreate=0;  //allowCreate=3 to enable create button
+
+        if(localStorage.getItem("immunID")!=null){
+            document.getElementById("immunID").value = localStorage.getItem("immunID");
+        }
+
+        function createResource(){
+            window.open("create_org_patient_immun.html", '_blank');
+        }
+
         function clearAllTextbox() {
             var elements = document.getElementsByTagName("input");
             for (var i=0; i < elements.length; i++) {
@@ -92,7 +103,6 @@
 
             allowCreate=0;
             document.getElementById("btnCreate").disabled= true;
-
         }
 
         function postData(resource, dataString, count) {

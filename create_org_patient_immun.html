@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <style type="text/css">
+        button {
+            height: 43px;
+            width: 140px;
+        }
+
+        textarea {
+            height: 400px;
+            width: 98%;
+        }
+
+        #myTable {
+            width:100%;
+        }
+
+    </style>
+    <script src="setting.js"></script>
+    <script src="HTTP2019.js"></script>
+</head>
+
+<body style="height: 780px">
+    
+<br><br>
+    <table id ="myTable">
+        <tr>
+            <td colspan="3">
+                <input id="btnCreate" onclick="createResource()" type="button" value="Create Resource" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <textarea id="taInput" name="S1"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Immunization Template
+            </td>
+            <td>
+                Patient Template
+            </td>
+            <td>
+                Organization Template
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <textarea id="taImmun" name="S1" readonly></textarea>
+            </td>
+            <td>
+                <textarea id="taPatient" name="S1" readonly></textarea>
+            </td>
+            <td>
+                <textarea id="taOrg" name="S1" readonly></textarea>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+        var allowCreate=0;  //allowCreate=3 to enable create button
+
+        var orgObj = {
+            "resourceType": "Organization",
+            "identifier": [
+                {
+                    "system": "https://ma.mohw.gov.tw/",
+                    "value": "0617060018"
+                }
+            ],
+            "name": "臺中榮民總醫院 Taichung Veterans General Hospital",
+            "address": [
+                {
+                    "country": "TW"
+                }
+            ]
+        };
+
+        var patObj = {
+            "resourceType": "Patient",
+            "identifier": [
+                {
+                    "system": "https://www.dicom.org.tw/cs/identityCardNumber_tw",
+                    "value": "M123456789"
+                }
+            ],
+            "name": [
+                {
+                    "text": "王大明",
+                    "family": "王",
+                    "given": ["大明"]
+                },
+                {
+                    "text": "Da-Ming Wang",
+                    "family": "Wang",
+                    "given": ["Da-Ming"]
+                }
+            ],
+            "birthDate": "1988-12-25",
+            "address": [
+                {
+                    "country": "TW"
+                }
+            ],
+            "managingOrganization": {
+                "reference": "Organization/1560"
+            }
+        };
+
+        var immunObj = {
+        "resourceType": "Immunization",
+        "status": "completed",
+        "vaccineCode": {
+          "coding": [
+            {
+              "system": "https://www.cdc.gov.tw",
+              "code": "CoV_AZ",
+              "display": "AZD1222"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/3699"
+        },
+        "occurrenceDateTime": "2021-07-22",
+		"performer": [
+			{
+			  "actor": {
+                "reference": "Organization/3698"
+              }
+			},
+			{
+			  "actor": { "display": "王醫師" }
+			}
+		],
+        "manufacturer": {
+          "display": "AstraZeneca"
+        },
+        "lotNumber": "CTMAV509-CDC",
+        "protocolApplied": [
+          {
+            "targetDisease": [
+              {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/sid/icd-10",
+                    "code": "U07.1",
+                    "display": "COVID-19, virus identified"
+                  }
+                ]
+              }
+            ],
+            "doseNumberPositiveInt": 2,
+            "seriesDosesPositiveInt": 2
+          }
+        ]
+      };
+
+      document.getElementById("taOrg").value = JSON.stringify(orgObj, undefined, 4);
+      document.getElementById("taPatient").value = JSON.stringify(patObj, undefined, 4);
+      document.getElementById("taImmun").value = JSON.stringify(immunObj, undefined, 4);
+        
+        function clearAllTextbox() {
+            var elements = document.getElementsByTagName("input");
+            for (var i=0; i < elements.length; i++) {
+                if (elements[i].type == "text") {
+                    elements[i].value = "";
+                }
+            }
+
+            elements = document.getElementsByTagName("textarea");
+            for (var i=0; i < elements.length; i++) {
+                elements[i].value = "";
+            }
+
+            allowCreate=0;
+            document.getElementById("btnCreate").disabled= true;
+
+        }
+
+        function createResource(){
+            var dataString = document.getElementById("taInput").value;
+            var JSONobj = JSON.parse(dataString);
+            if(JSONobj.id!=null){
+                var apiURL = FHIRrootURL + '/' + JSONobj.resourceType + '/' + JSONobj.id;
+                HTTPPutData(apiURL, dataString);
+            }
+            else {
+                var apiURL = FHIRrootURL + '/' + JSONobj.resourceType;
+            HTTPPostData(apiURL, dataString, createResourceResp, 1);
+            }
+        }
+
+        function createResourceResp(count, ret){
+            document.getElementById("taInput").value = ret;
+            var JSONobj = JSON.parse(ret);
+            alert(JSONobj.resourceType + " resource creation success! ID: " + JSONobj.id);
+            if(JSONobj.resourceType==="Immunization") {
+                localStorage.setItem("immunID", JSONobj.id);
+            }
+        }  
+
+    </script>
+</body>
+
+</html>
