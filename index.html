@@ -32,32 +32,21 @@
         <option>Organization</option>
     </select><br><br>
 
-    <input id="Button1" onclick="postData()" type="button" value="Post Data" />
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <input id="Button2" onclick="putData()" type="button" value="Put Data" />
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <input id="Button3" onclick="deleteData()" type="button" value="Delete Data" />
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
     <input id="btnSearch" onclick="searchData()" type="button" value="Search Data" />
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-    <input id="Button4" onclick="myPost()" type="button" value="My Data" />
-    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-
-    <p><input id="inputText" type="text" placeholder="Immunization ID" size="70" /></p>
-    <p></p>
+<br><br>
     <table id ="myTable">
         <tr>
             <td>
                 Immunization<br>
-                ID: <input type="text" id="immunID" />
+                ID: <input type="text" id="immunID" placeholder="ex. 2461" />
             </td>
             <td>
                 Patient<br>
-                ID: <input type="text" id="patientID" />
+                ID: <input type="text" id="patientID" readonly />
             </td>
             <td>
                 Organization<br>
-                ID: <input type="text" id="orgID" />
+                ID: <input type="text" id="orgID" readonly />
             </td>
         </tr>
         <tr>
@@ -74,11 +63,11 @@
         <tr>
             <td>
                 Composition<br>
-                ID: <input type="text" id="compID" />
+                ID: <input type="text" id="compID" readonly />
             </td>
             <td>
                 Document<br>
-                ID: <input type="text" id="docID" />
+                ID: <input type="text" id="docID" readonly />
             </td>
         </tr>
         <tr>
@@ -118,7 +107,7 @@
         }
 
         function searchData() {
-            var immunID = document.getElementById("inputText").value;
+            var immunID = document.getElementById("immunID").value;
             var resourceID = document.getElementById("resource");
             var selected = resourceID.options[resource.selectedIndex].text;
             var apiURL = FHIRrootURL + '/' + selected + '/' + immunID;
