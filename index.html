@@ -11,7 +11,7 @@
         }
 
         textarea {
-            height: 500px;
+            height: 400px;
             width: 98%;
         }
 
@@ -25,14 +25,9 @@
 </head>
 
 <body style="height: 780px">
-    Resource :
-    <select id="resource">
-        <option>Immunization</option>
-        <option>Patient</option>
-        <option>Organization</option>
-    </select><br><br>
-
-    <input id="btnSearch" onclick="searchData()" type="button" value="Search Data" />
+    <input id="btnSearch" onclick="searchImmun()" type="button" value="Search Immunization" />
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input id="btnCreate" onclick="createDocument()" type="button" value="Create Immunization Certificate" />
 <br><br>
     <table id ="myTable">
         <tr>
@@ -81,50 +76,37 @@
     </table>
 
     <script>
+    
+        function clearAllTextbox() {
+            var elements = document.getElementsByTagName("input");
+            for (var i=0; i < elements.length; i++) {
+                if (elements[i].type == "text") {
+                    elements[i].value = "";
+                }
+            }
+
+            elements = document.getElementsByTagName("textarea");
+            for (var i=0; i < elements.length; i++) {
+                elements[i].value = "";
+            }
+        }
+
         function postData(resource, dataString, count) {
-            // var dataString = document.getElementById("TextArea1").value;
-            // var resourceID = document.getElementById("resource");
-            // var selected = resourceID.options[resource.selectedIndex].text;
             var apiURL = FHIRrootURL + '/' + resource;
             HTTPPostData(apiURL, dataString, manageResponseRet, count);
         }
 
-        function putData() {
-            var dataString = document.getElementById("TextArea1").value;
-            var resourceID = document.getElementById("resource");
-            var selected = resourceID.options[resource.selectedIndex].text;
-            var idFHIR = JSON.parse(dataString).id;
-            var apiURL = FHIRrootURL + '/' + selected + '/' + idFHIR;
-            HTTPPutData(apiURL, dataString);
-        }
-
-        function deleteData() {
-            var dataString = document.getElementById("TextArea1").value;
-            var resourceID = document.getElementById("resource");
-            var selected = resourceID.options[resource.selectedIndex].text;
-            var apiURL = FHIRrootURL + '/' + selected + '/' + dataString;
-            HTTPDeleteData(apiURL);
-        }
-
-        function searchData() {
+        function searchImmun() {
             var immunID = document.getElementById("immunID").value;
-            var resourceID = document.getElementById("resource");
-            var selected = resourceID.options[resource.selectedIndex].text;
-            var apiURL = FHIRrootURL + '/' + selected + '/' + immunID;
+            var apiURL = FHIRrootURL + '/Immunization/' + immunID;
+            clearAllTextbox();
             HTTPGetData(apiURL, manageResponseRet, 1);
         }
 
-        function myPost() {
-            var filename = document.getElementById("filename").value;
-            var fhirStudy = {};
-
-            var dataString = document.getElementById("TextArea1").value;
-            var resourceID = document.getElementById("resource");
-            var selected = resourceID.options[resource.selectedIndex].text;
-            var apiURL = FHIRrootURL + '/' + selected + '/' + dataString;
-            HTTPDeleteData(apiURL);
+        function createDocument() {
+            //get Composition resource template
+            HTTPGetData("composition-sample.json", manageResponseRet, 4);
         }
-        
 
         function manageResponseRet(count, ret) { // alert(ret);
             if(count === 1 ){
@@ -155,8 +137,6 @@
                 document.getElementById("orgID").value = JSON.parse(ret).id;
                 localStorage.setItem("fhirOrg", ret);
 
-                //get Composition resource template
-                HTTPGetData("composition-sample.json", manageResponseRet, 4);
             }
             else if(count === 4){
                 //display Composition resource template
@@ -217,7 +197,10 @@
             else if(count === 7){
                 //display posted Document resource & get ID
                 document.getElementById("taDoc").value = ret;
-                document.getElementById("docID").value = JSON.parse(ret).id;
+                var certID = JSON.parse(ret).id;
+                document.getElementById("docID").value = certID;
+
+                alert("Certificate creation success! ID: "+ certID);
             }
         }
     </script>
