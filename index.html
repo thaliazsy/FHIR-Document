@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <style type="text/css">
+        button {
+            height: 43px;
+            width: 140px;
+        }
+
+        textarea {
+            height: 500px;
+            width: 98%;
+        }
+
+        #myTable {
+            width:100%;
+        }
+
+    </style>
+    <script src="setting.js"></script>
+    <script src="HTTP2019.js"></script>
+</head>
+
+<body style="height: 780px">
+    Resource :
+    <select id="resource">
+        <option>Immunization</option>
+        <option>Patient</option>
+        <option>Organization</option>
+    </select><br><br>
+
+    <input id="Button1" onclick="postData()" type="button" value="Post Data" />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <input id="Button2" onclick="putData()" type="button" value="Put Data" />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <input id="Button3" onclick="deleteData()" type="button" value="Delete Data" />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <input id="btnSearch" onclick="searchData()" type="button" value="Search Data" />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <input id="Button4" onclick="myPost()" type="button" value="My Data" />
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+    <p><input id="inputText" type="text" placeholder="Immunization ID" size="70" /></p>
+    <p></p>
+    <table id ="myTable">
+        <tr>
+            <td>
+                Immunization<br>
+                ID: <input type="text" id="immunID" />
+            </td>
+            <td>
+                Patient<br>
+                ID: <input type="text" id="patientID" />
+            </td>
+            <td>
+                Organization<br>
+                ID: <input type="text" id="orgID" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <textarea id="taImmun" name="S1"></textarea>
+            </td>
+            <td>
+                <textarea id="taPatient" name="S1"></textarea>
+            </td>
+            <td>
+                <textarea id="taOrg" name="S1"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                Composition<br>
+                ID: <input type="text" id="compID" />
+            </td>
+            <td>
+                Document<br>
+                ID: <input type="text" id="docID" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <textarea id="taComp" name="S1"></textarea>
+            </td>
+            <td>
+                <textarea id="taDoc" name="S1"></textarea>
+            </td>
+        </tr>
+    </table>
+
+    <script>
+        function postData(resource, dataString, count) {
+            // var dataString = document.getElementById("TextArea1").value;
+            // var resourceID = document.getElementById("resource");
+            // var selected = resourceID.options[resource.selectedIndex].text;
+            var apiURL = FHIRrootURL + '/' + resource;
+            HTTPPostData(apiURL, dataString, manageResponseRet, count);
+        }
+
+        function putData() {
+            var dataString = document.getElementById("TextArea1").value;
+            var resourceID = document.getElementById("resource");
+            var selected = resourceID.options[resource.selectedIndex].text;
+            var idFHIR = JSON.parse(dataString).id;
+            var apiURL = FHIRrootURL + '/' + selected + '/' + idFHIR;
+            HTTPPutData(apiURL, dataString);
+        }
+
+        function deleteData() {
+            var dataString = document.getElementById("TextArea1").value;
+            var resourceID = document.getElementById("resource");
+            var selected = resourceID.options[resource.selectedIndex].text;
+            var apiURL = FHIRrootURL + '/' + selected + '/' + dataString;
+            HTTPDeleteData(apiURL);
+        }
+
+        function searchData() {
+            var immunID = document.getElementById("inputText").value;
+            var resourceID = document.getElementById("resource");
+            var selected = resourceID.options[resource.selectedIndex].text;
+            var apiURL = FHIRrootURL + '/' + selected + '/' + immunID;
+            HTTPGetData(apiURL, manageResponseRet, 1);
+        }
+
+        function myPost() {
+            var filename = document.getElementById("filename").value;
+            var fhirStudy = {};
+
+            var dataString = document.getElementById("TextArea1").value;
+            var resourceID = document.getElementById("resource");
+            var selected = resourceID.options[resource.selectedIndex].text;
+            var apiURL = FHIRrootURL + '/' + selected + '/' + dataString;
+            HTTPDeleteData(apiURL);
+        }
+        
+
+        function manageResponseRet(count, ret) { // alert(ret);
+            if(count === 1 ){
+                //display Immunization resource
+                document.getElementById("taImmun").value = ret;
+                document.getElementById("immunID").value = JSON.parse(ret).id;
+                localStorage.setItem("fhirImmun", ret);
+
+                //get patient ID and resource
+                var idFHIR = JSON.parse(ret).patient.reference;
+                var apiURL = FHIRrootURL + '/' + idFHIR;
+                HTTPGetData(apiURL, manageResponseRet, 2);
+            }
+            else if(count === 2){
+                //display Patient resource
+                document.getElementById("taPatient").value = ret;
+                document.getElementById("patientID").value = JSON.parse(ret).id;
+                localStorage.setItem("fhirPatient", ret);
+
+                //get managingOrganization ID and resource
+                var idFHIR = JSON.parse(ret).managingOrganization.reference;
+                var apiURL = FHIRrootURL + '/' + idFHIR;
+                HTTPGetData(apiURL, manageResponseRet, 3);
+            }
+            else if(count === 3 ){
+                //display Organization resource
+                document.getElementById("taOrg").value = ret;
+                document.getElementById("orgID").value = JSON.parse(ret).id;
+                localStorage.setItem("fhirOrg", ret);
+
+                //get Composition resource template
+                HTTPGetData("composition-sample.json", manageResponseRet, 4);
+            }
+            else if(count === 4){
+                //display Composition resource template
+                document.getElementById("taComp").value = ret;
+                var compObj = JSON.parse(ret);
+
+                //get immunization date
+                var immunObj = JSON.parse(localStorage.getItem("fhirImmun"));
+                var date = immunObj.occurrenceDateTime;
+
+                //create FHIR composition
+                compObj.subject.reference="urn:uuid:"+ document.getElementById("patientID").value;
+                compObj.date=date;
+                compObj.title="COVID-19 Vaccine Certificate "+ date;
+                compObj.author[0].reference="urn:uuid:"+document.getElementById("orgID").value;
+                compObj.section[0].entry[0].reference="urn:uuid:"+ document.getElementById("patientID").value;
+                compObj.section[0].entry[1].reference="urn:uuid:"+ document.getElementById("immunID").value;
+                compObj.section[0].entry[2].reference="urn:uuid:"+ document.getElementById("orgID").value;
+                
+                document.getElementById("taDoc").value = JSON.stringify(compObj, undefined, 4);
+
+                //post FHIR Composition resource
+                postData("Composition", JSON.stringify(compObj), 5);
+
+            }
+            else if(count === 5){
+                //display posted Composition resource & get ID
+                document.getElementById("taComp").value = ret;
+                document.getElementById("compID").value = JSON.parse(ret).id;
+                localStorage.setItem("fhirComp", ret);
+
+                //get Document resource template
+                HTTPGetData("document-sample.json", manageResponseRet, 6);
+            }
+            else if(count === 6){
+                //display Document resource template
+                document.getElementById("taDoc").value = ret;
+                var docObj = JSON.parse(ret);
+
+                //create FHIR Document
+                docObj.entry[0].fullUrl = "urn:uuid:"+ document.getElementById("compID").value;
+                docObj.entry[0].resource = JSON.parse(localStorage.getItem("fhirComp"));
+
+                docObj.entry[1].fullUrl = "urn:uuid:"+ document.getElementById("orgID").value;
+                docObj.entry[1].resource = JSON.parse(localStorage.getItem("fhirOrg"));
+
+                docObj.entry[2].fullUrl = "urn:uuid:"+ document.getElementById("patientID").value;
+                docObj.entry[2].resource = JSON.parse(localStorage.getItem("fhirPatient"));
+
+                docObj.entry[3].fullUrl = "urn:uuid:"+ document.getElementById("immunID").value;
+                docObj.entry[3].resource = JSON.parse(localStorage.getItem("fhirImmun"));
+
+                document.getElementById("taDoc").value = JSON.stringify(docObj, undefined, 4);
+
+                //post FHIR Bundle Document resource
+                postData("Bundle", JSON.stringify(docObj), 7);
+            }
+            else if(count === 7){
+                //display posted Document resource & get ID
+                document.getElementById("taDoc").value = ret;
+                document.getElementById("docID").value = JSON.parse(ret).id;
+            }
+        }
+    </script>
+</body>
+
+</html>

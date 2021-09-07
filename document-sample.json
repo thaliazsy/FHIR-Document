@@ -1,0 +1,159 @@
+{
+  "resourceType": "Bundle",
+  "id": "",
+  "identifier" : {
+    "system" : "https://www.vghtc.gov.tw",
+    "value" : "TW.0617060018.20210722143000888.001",
+    "period" : {
+      "start" : "2021-07-22",
+      "end" : "2022-07-22"
+    }
+  },
+  "type": "document",
+  "entry": [
+    {
+      "fullUrl" : "urn:uuid:b1995ae1-0c52-48cb-b019-afbfc6f92881",
+	  "resource" : {
+		"resourceType" : "Composition",
+		"id" : "b1995ae1-0c52-48cb-b019-afbfc6f92881",
+		"status" : "final",
+		"type" : {
+		  "coding" : [
+			{
+			  "system" : "http://loinc.org",
+			  "code" : "82593-5",
+			  "display" : "Immunization summary report"
+			}
+		  ]
+		},
+		"subject" : {
+		  "reference" : "urn:uuid:e2326984-eabb-11eb-9a03-0242ac130003"
+		},
+		"date" : "2021-07-22T14:30:00+08:00",
+		"title" : "COVID-19 Vaccine Certificate July 22, 2021 14:30",
+		"author" : [
+          {
+		    "reference" : "urn:uuid:45a5c5b1-4ec1-4d60-b4b2-ff5a84a41fd7"
+		  }
+        ],
+		"section" : [
+		  {
+			"entry" : [
+			  {
+				"reference" : "urn:uuid:e2326984-eabb-11eb-9a03-0242ac130003"
+			  },
+			  {
+				"reference" : "urn:uuid:c6371c72-eac3-11eb-9a03-0242ac130003"
+			  },
+			  {
+				"reference" : "urn:uuid:45a5c5b1-4ec1-4d60-b4b2-ff5a84a41fd7"
+			  }
+			]
+		  }
+		]
+	  }
+	},
+	{
+      "fullUrl" : "urn:uuid:45a5c5b1-4ec1-4d60-b4b2-ff5a84a41fd7",
+      "resource": {
+        "resourceType": "Organization",
+        "id": "45a5c5b1-4ec1-4d60-b4b2-ff5a84a41fd7",
+        "identifier": [
+          {
+            "system": "https://ma.mohw.gov.tw/",
+            "value": "0617060018"
+          }
+        ],
+        "name": "臺中榮民總醫院 Taichung Veterans General Hospital",
+        "address": [
+            {
+              "country": "TW"
+            }
+        ]
+      }
+    },
+    {
+      "fullUrl" : "urn:uuid:e2326984-eabb-11eb-9a03-0242ac130003",
+      "resource": {
+        "resourceType": "Patient",
+        "id": "e2326984-eabb-11eb-9a03-0242ac130003",
+        "identifier": [
+          {
+            "system": "https://www.dicom.org.tw/cs/identityCardNumber_tw",
+            "value": "M123456789"
+          }
+        ],
+        "name": [
+          {
+            "text": "王大明",
+            "family": "王",
+            "given": ["大明"]
+          },
+		  {
+            "text": "Da-Ming Wang",
+            "family": "Wang",
+            "given": ["Da-Ming"]
+          }
+        ],
+        "birthDate": "1988-12-25",
+		"address": [
+            {
+              "country": "TW"
+            }
+        ]
+      }
+    },
+    {
+      "fullUrl" : "urn:uuid:c6371c72-eac3-11eb-9a03-0242ac130003",
+      "resource": {
+        "resourceType": "Immunization",
+		"id": "c6371c72-eac3-11eb-9a03-0242ac130003",
+        "status": "completed",
+        "vaccineCode": {
+          "coding": [
+            {
+              "system": "https://www.cdc.gov.tw",
+              "code": "CoV_AZ",
+              "display": "AZD1222"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/e2326984-eabb-11eb-9a03-0242ac130003"
+        },
+        "occurrenceDateTime": "2021-07-22",
+		"performer": [
+			{
+			  "actor": {
+                "reference": "Organization/45a5c5b1-4ec1-4d60-b4b2-ff5a84a41fd7"
+              }
+			},
+			{
+			  "actor": { "display": "王醫師" }
+			}
+		],
+        "manufacturer": {
+          "display": "AstraZeneca"
+        },
+        "lotNumber": "CTMAV509-CDC",
+        "protocolApplied": [
+          {
+            "targetDisease": [
+              {
+                "coding": [
+                  {
+                    "system": "http://hl7.org/fhir/sid/icd-10",
+                    "code": "U07.1",
+                    "display": "COVID-19, virus identified"
+                  }
+                ]
+              }
+            ],
+            "doseNumberPositiveInt": 2,
+            "seriesDosesPositiveInt": 2
+          }
+        ]
+      }
+    }
+  ]
+}

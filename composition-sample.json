@@ -1,0 +1,38 @@
+{
+    "resourceType" : "Composition",
+    "status" : "final",
+    "type" : {
+      "coding" : [
+        {
+          "system" : "http://loinc.org",
+          "code" : "82593-5",
+          "display" : "Immunization summary report"
+        }
+      ]
+    },
+    "subject" : {
+      "reference" : "urn:uuid:e2326984-eabb-11eb-9a03-0242ac130003"
+    },
+    "date" : "2021-07-22T14:30:00+08:00",
+    "title" : "COVID-19 Vaccine Certificate July 22, 2021 14:30",
+    "author" : [
+      {
+        "reference" : "urn:uuid:45a5c5b1-4ec1-4d60-b4b2-ff5a84a41fd7"
+      }
+    ],
+    "section" : [
+      {
+        "entry" : [
+          {
+            "reference" : "urn:uuid:e2326984-eabb-11eb-9a03-0242ac130003"
+          },
+          {
+            "reference" : "urn:uuid:c6371c72-eac3-11eb-9a03-0242ac130003"
+          },
+          {
+            "reference" : "urn:uuid:45a5c5b1-4ec1-4d60-b4b2-ff5a84a41fd7"
+          }
+        ]
+      }
+    ]
+  }
