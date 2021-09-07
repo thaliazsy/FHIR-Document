@@ -27,7 +27,7 @@
 <body style="height: 780px">
     <input id="btnSearch" onclick="searchImmun()" type="button" value="Search Immunization" />
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <input id="btnCreate" onclick="createDocument()" type="button" value="Create Immunization Certificate" />
+    <input id="btnCreate" onclick="createDocument()" type="button" value="Create Immunization Certificate" disabled/>
 <br><br>
     <table id ="myTable">
         <tr>
@@ -76,7 +76,7 @@
     </table>
 
     <script>
-    
+        var allowCreate=0;  //allowCreate=3 to enable create button
         function clearAllTextbox() {
             var elements = document.getElementsByTagName("input");
             for (var i=0; i < elements.length; i++) {
@@ -89,6 +89,10 @@
             for (var i=0; i < elements.length; i++) {
                 elements[i].value = "";
             }
+
+            allowCreate=0;
+            document.getElementById("btnCreate").disabled= true;
+
         }
 
         function postData(resource, dataString, count) {
@@ -112,35 +116,60 @@
             if(count === 1 ){
                 //display Immunization resource
                 document.getElementById("taImmun").value = ret;
-                document.getElementById("immunID").value = JSON.parse(ret).id;
-                localStorage.setItem("fhirImmun", ret);
 
-                //get patient ID and resource
-                var idFHIR = JSON.parse(ret).patient.reference;
-                var apiURL = FHIRrootURL + '/' + idFHIR;
-                HTTPGetData(apiURL, manageResponseRet, 2);
+                if(JSON.parse(ret).resourceType != "Immunization"){
+                    alert("Immunization not found!");
+                }
+                else{
+                    allowCreate++;
+                    document.getElementById("immunID").value = JSON.parse(ret).id;
+                    localStorage.setItem("fhirImmun", ret);
+
+                    //get patient ID and resource
+                    var idFHIR = JSON.parse(ret).patient.reference;
+                    var apiURL = FHIRrootURL + '/' + idFHIR;
+                    HTTPGetData(apiURL, manageResponseRet, 2);
+                }
             }
             else if(count === 2){
                 //display Patient resource
                 document.getElementById("taPatient").value = ret;
-                document.getElementById("patientID").value = JSON.parse(ret).id;
-                localStorage.setItem("fhirPatient", ret);
 
-                //get managingOrganization ID and resource
-                var idFHIR = JSON.parse(ret).managingOrganization.reference;
-                var apiURL = FHIRrootURL + '/' + idFHIR;
-                HTTPGetData(apiURL, manageResponseRet, 3);
+                if(JSON.parse(ret).resourceType != "Patient"){
+                    alert("Patient not found!");
+                }
+                else{
+                    allowCreate++;
+                    document.getElementById("patientID").value = JSON.parse(ret).id;
+                    localStorage.setItem("fhirPatient", ret);
+                    
+                    //get managingOrganization ID and resource
+                    var idFHIR = JSON.parse(ret).managingOrganization.reference;
+                    var apiURL = FHIRrootURL + '/' + idFHIR;
+                    HTTPGetData(apiURL, manageResponseRet, 3);
+                }
             }
             else if(count === 3 ){
                 //display Organization resource
                 document.getElementById("taOrg").value = ret;
-                document.getElementById("orgID").value = JSON.parse(ret).id;
-                localStorage.setItem("fhirOrg", ret);
 
+                if(JSON.parse(ret).resourceType != "Organization"){
+                    alert("Organization not found!");
+                }
+                else{
+                    allowCreate++;
+                    document.getElementById("orgID").value = JSON.parse(ret).id;
+                    localStorage.setItem("fhirOrg", ret);
+                }
+
+                //enable create button if immunization, patient, and organization resource exist
+                if(allowCreate===3){
+                    document.getElementById("btnCreate").disabled= false;
+                }
             }
             else if(count === 4){
                 //display Composition resource template
-                document.getElementById("taComp").value = ret;
+                //document.getElementById("taComp").value = ret;
                 var compObj = JSON.parse(ret);
 
                 //get immunization date
@@ -156,8 +185,6 @@
                 compObj.section[0].entry[1].reference="urn:uuid:"+ document.getElementById("immunID").value;
                 compObj.section[0].entry[2].reference="urn:uuid:"+ document.getElementById("orgID").value;
                 
-                document.getElementById("taDoc").value = JSON.stringify(compObj, undefined, 4);
-
                 //post FHIR Composition resource
                 postData("Composition", JSON.stringify(compObj), 5);
 
@@ -173,7 +200,7 @@
             }
             else if(count === 6){
                 //display Document resource template
-                document.getElementById("taDoc").value = ret;
+                //document.getElementById("taDoc").value = ret;
                 var docObj = JSON.parse(ret);
 
                 //create FHIR Document
@@ -188,8 +215,6 @@
 
                 docObj.entry[3].fullUrl = "urn:uuid:"+ document.getElementById("immunID").value;
                 docObj.entry[3].resource = JSON.parse(localStorage.getItem("fhirImmun"));
-
-                document.getElementById("taDoc").value = JSON.stringify(docObj, undefined, 4);
 
                 //post FHIR Bundle Document resource
                 postData("Bundle", JSON.stringify(docObj), 7);
