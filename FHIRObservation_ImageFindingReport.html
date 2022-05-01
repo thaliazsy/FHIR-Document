@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title></title>
+    <style type="text/css">
+        button {
+            height: 43px;
+            width: 140px;
+        }
+
+        textarea {
+            height: 400px;
+            width: 98%;
+        }
+
+        #myTable {
+            width:100%;
+        }
+
+    </style>
+    <script src="setting.js"></script>
+    <script src="HTTP2019.js"></script>
+</head>
+
+<body style="height: 780px">
+    
+<br><br>
+    <table id ="myTable">
+        <tr>
+            <td colspan="3">
+                <input id="btnCreate" onclick="createResource()" type="button" value="Create Resource" />
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <textarea id="taInput" name="S1"></textarea>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                FHIR Patient Template
+            </td>
+            <td>
+                FHIR ImagingStudy Template
+            </td>
+            <td>
+                FHIR Observation (Annotation) Template
+            </td>
+            <td>
+                FHIR Observation (Image Finding Report) Template
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <textarea id="taPatient" name="S1" readonly></textarea>
+            </td>
+            <td>
+                <textarea id="taImagingStudy" name="S1" readonly></textarea>
+            </td>
+            <td>
+                <textarea id="taAnn" name="S1" readonly></textarea>
+            </td>
+            <td>
+                <textarea id="taReport" name="S1" readonly></textarea>
+            </td>
+        </tr>
+    </table>
+    
+    <script>
+        var allowCreate=0;  //allowCreate=3 to enable create button
+        var patObj ={
+        "resourceType": "Patient",
+        "identifier": [
+            {
+            "use": "usual",
+            "system": "身分證字號",
+            "value": "U12345622211",
+            "assigner": {
+                "reference": "Ministry of the Interior Affairs",
+                "display": "內政部"
+            }
+            }
+        ],
+        "name": [
+        {
+        "use": "official",
+        "text": "林帶玉",
+        "family": "林",
+        "given": ["林帶玉"]
+        }        
+        ],
+        "gender": "female",
+        "birthDate": "1773-01-21"
+        };
+
+
+        var ImgStd = {
+            "resourceType": "ImagingStudy",
+            "identifier": [
+                {
+                "system": "urn:dicom:uid",
+                "value": "urn:oid:1.3.6.1.4.1.5962.99.1.392793638.85272995.1542286085670.4.0"
+                }
+            ],
+            "status": "available",
+            "subject": {
+                "reference": "Patient/7405"
+            },
+            "started": "2010-04-06T16:39:39+00:00",
+            "numberOfSeries": 1,
+            "numberOfInstances": 4,
+            "series": [
+                {
+                "uid": "1.3.6.1.4.1.5962.99.1.392793638.85272995.1542286085670.5.0",
+                "number": 49824,
+                "modality": {
+                    "system": "http://dicom.nema.org/resources/ontology/DCM",
+                    "code": "MG"
+                },
+                "numberOfInstances": 4,
+                "bodySite": {
+                    "display": "Breast"
+                },
+                "instance": [
+                    {
+                    "uid": "1.3.6.1.4.1.5962.99.1.392793638.85272995.1542286085670.3.0",
+                    "sopClass": {
+                        "system": "urn:ietf:rfc:3986",
+                        "code": "urn:oid:1.2.840.10008.5.1.4.1.1.1.2"
+                    },
+                    "number": 1
+                    },
+                    {
+                    "uid": "1.3.6.1.4.1.5962.99.1.392793638.85272995.1542286085670.7.0",
+                    "sopClass": {
+                        "system": "urn:ietf:rfc:3986",
+                        "code": "urn:oid:1.2.840.10008.5.1.4.1.1.1.2"
+                    },
+                    "number": 2
+                    },
+                    {
+                    "uid": "1.3.6.1.4.1.5962.99.1.392793638.85272995.1542286085670.9.0",
+                    "sopClass": {
+                        "system": "urn:ietf:rfc:3986",
+                        "code": "urn:oid:1.2.840.10008.5.1.4.1.1.1.2"
+                    },
+                    "number": 3
+                    },
+                    {
+                    "uid": "2.16.124.113543.6003.189642796.63084.16748.2599092903",
+                    "sopClass": {
+                        "system": "urn:ietf:rfc:3986",
+                        "code": "urn:oid:1.3.6.1.4.1.5962.99.1.392793638.85272995.1542286085670.11.0"
+                    },
+                    "number": 4
+                    }
+                ]
+                }
+            ]
+            };
+            
+        var Ann = {
+            "resourceType": "Observation",
+            "id": "769",
+            "meta": {
+                "versionId": "1",
+                "lastUpdated": "2020-12-18T14:46:43.884+00:00",
+                "source": "#AwjuoO2vWZR2JbBj"
+            },
+            "identifier": [
+                {
+                "system": "http://127.0.0.1:5500/MedicalImagingExamWorkflow/systemA.html",
+                "value": "1.3.6.1.4.1.5962.99.1.392793638.85272995.1542286085670.3.0"
+                }
+            ],
+            "basedOn": [
+                {
+                "identifier": {
+                    "system": "http://127.0.0.1:5500/MedicalImagingExamWorkflow/systemA.html",
+                    "value": "1.3.6.1.4.1.5962.99.1.392793638.85272995.1542286085670.3.0"
+                }
+                }
+            ],
+            "status": "final",
+            "category": [
+                {
+                "coding": [
+                    {
+                    "system": "http://hl7.org/fhir/observation-category",
+                    "code": "imaging"
+                    }
+                ]
+                }
+            ],
+            "code": {
+                "coding": [
+                {
+                    "system": "https://www.dicom.org.tw/cs/imaging",
+                    "code": "MR"
+                }
+                ]
+            },
+            "subject": {
+                "reference": "Patient/7405"
+            },
+            "derivedFrom": [
+                {
+                "reference": "ImagingStudy/757"
+                }
+            ],
+            "component": [
+                {
+                "code": {
+                    "coding": [
+                    {
+                        "system": "https://www.dicom.org.tw/SVG",
+                        "code": "SVG.Annotation",
+                        "display": "SVG Annotation"
+                    }
+                    ]
+                },
+                "valueString": "PHN2ZyB3aWR0aD0iMTkxNCIgaGVpZ2h0PSI2MDAiPjxsaW5lIHgxPSIxMjE3IiB5MT0iNzc5IiB4Mj0iMTQxNiIgeTI9IjEzODQiIHN0cm9rZT0iYmxhY2siIHN0cm9rZS13aWR0aD0iMiIgZmlsbD0ibm9uZSIvPjwvc3ZnPg=="
+                },
+                {
+                "code": {
+                    "coding": [
+                    {
+                        "system": "https://www.dicom.org.tw/Columns",
+                        "code": "Columns",
+                        "display": "viewPort.sx"
+                    }
+                    ]
+                },
+                "valueString": "1914"
+                },
+                {
+                "code": {
+                    "coding": [
+                    {
+                        "system": "https://www.dicom.org.tw/Rows",
+                        "code": "Rows",
+                        "display": "viewPort.sy"
+                    }
+                    ]
+                },
+                "valueString": "2294"
+                },
+                {
+                "code": {
+                    "coding": [
+                    {
+                        "system": "https://www.dicom.org.tw/WindowLevel",
+                        "code": "WindowCenter",
+                        "display": "WindowCenter"
+                    }
+                    ]
+                },
+                "valueString": "2587"
+                },
+                {
+                "code": {
+                    "coding": [
+                    {
+                        "system": "https://www.dicom.org.tw/WindowLevel",
+                        "code": "WindowWidth",
+                        "display": "WindowWidth"
+                    }
+                    ]
+                },
+                "valueString": "900"
+                },
+                {
+                "code": {
+                    "coding": [
+                    {
+                        "system": "https://www.dicom.org.tw/OffsetOfPixelData",
+                        "code": "OffsetOfPixelData"
+                    }
+                    ]
+                },
+                "valueString": "29247"
+                },
+                {
+                "code": {
+                    "coding": [
+                    {
+                        "system": "https://www.dicom.org.tw/DCM_File",
+                        "code": "DCM File",
+                        "display": "DCM File"
+                    }
+                    ]
+                },
+                "valueString": "http://203.64.84.218:8080/orthanc/dicom-web/studies/1.3.6.1.4.1.5962.99.1.392793638.85272995.1542286085670.4.0/series/1.3.6.1.4.1.5962.99.1.392793638.85272995.1542286085670.5.0/instances/1.3.6.1.4.1.5962.99.1.392793638.85272995.1542286085670.3.0"
+                }
+            ]
+            };
+        var report={
+            "resourceType": "Observation",
+            "identifier": [
+                {
+                "system": "http://127.0.0.1:5500/MedicalImagingExamWorkflow/findingReport/MammoMass.html?annotationID=769&rowNum=1&findingType=Mammo%20Mass&imagingStudyID=757&patientStudyID=858b1cca-246800b9-ccf2765e-96783fe1-109d3b18",
+                "value": "mass"
+                }
+            ],
+            "status": "final",
+            "code": {
+                "coding": [
+                {
+                    "system": "http://hl7.org/fhir/STU3/valueset-observation-codes.html",
+                    "code": "RID39055"
+                }
+                ]
+            },
+            "subject": {
+                "reference": "Patient/7405"
+            },
+            "derivedFrom": [
+                {
+                "reference": "Observation/7411"
+                }
+            ],
+            "component": [
+                {
+                "code": {
+                    "coding": [
+                    {
+                    "system": "http://hl7.org/fhir/valueset-bodysite-laterality.html",
+                    "code": "MB",
+                    "display": "Bilateral"
+                    }
+                    ]
+                }
+                },
+            {"code": {
+                
+                    "coding": [
+                    {
+            "fhir_comments": [
+                    "Location"
+                    ],
+                        "system": "http://203.64.84.218/mammoDicomWebviewer/newCodeSystem/LocationCS.html",
+                        "code": "breast.left.uoq",
+                        "display": "Upper outer quadrant of left breast"
+                    }
+                    ]
+                }
+                },
+            {
+                "code": {
+                    "coding": [
+                    {
+                        "fhir_comments": [
+                        " One view Only "
+                        ],
+                        "system": "HemisphereCS",
+                        "code": "UH",
+                        "display": "Upper_hemisphere"
+                    }
+                    ]
+                }
+                },
+                {
+                "code": {
+            "coding": [
+                    {
+                        "system": "SizeCS",
+                        "code": "3-4 cm",
+                        "display": "3-4 cm"
+                    }
+                    ]
+                }
+                },
+                {
+                "code": {
+                    "coding": [
+                    {
+                        "system": "http://hl7.org/fhir/us/breast-radiology/2019Sep/ValueSet-breastrad-ShapeVS.html",
+                        "code": "IrregularShape",
+                        "display": "Neither round nor oval"
+                    }
+                    ]
+                }
+                },
+                {
+                "code": {
+                    "coding": [
+                    {
+                        "system": "http://hl7.org/fhir/us/breast-radiology/2019Sep/ValueSet-breastrad-MarginVS.html",
+                        "code": "ObscuredMargin",
+                        "display": "ObscuredMargin"
+                    }
+                    ]
+                }
+                },
+                {
+                "code": {
+                    "coding": [
+                    {
+                        "system": "http://hl7.org/fhir/us/breast-radiology/2019Sep/ValueSet-breastrad-AbnormalityDensityVS.html",
+                        "code": "FatContaining",
+                        "display": "Includes all masses containing fat, such as oil cyst, lipoma, or galactocele as well as mixeddensity lesions such as hamartoma."
+                    }
+                    ]
+                }
+                }
+            ]
+            }
+      document.getElementById("taImagingStudy").value = JSON.stringify(ImgStd, undefined, 4);
+      document.getElementById("taPatient").value = JSON.stringify(patObj, undefined, 4);
+      document.getElementById("taAnn").value = JSON.stringify(Ann, undefined, 4);
+      document.getElementById("taReport").value = JSON.stringify(report, undefined, 4);
+        
+        function clearAllTextbox() {
+            var elements = document.getElementsByTagName("input");
+            for (var i=0; i < elements.length; i++) {
+                if (elements[i].type == "text") {
+                    elements[i].value = "";
+                }
+            }
+
+            elements = document.getElementsByTagName("textarea");
+            for (var i=0; i < elements.length; i++) {
+                elements[i].value = "";
+            }
+
+            allowCreate=0;
+            document.getElementById("btnCreate").disabled= true;
+
+        }
+
+        function createResource(){
+            var dataString = document.getElementById("taInput").value;
+            var JSONobj = JSON.parse(dataString);
+            if(JSONobj.id!=null){
+                var apiURL = FHIRrootURL + '/' + JSONobj.resourceType + '/' + JSONobj.id;
+                HTTPPutData(apiURL, dataString);
+            }
+            else {
+                var apiURL = FHIRrootURL + '/' + JSONobj.resourceType;
+            HTTPPostData(apiURL, dataString, createResourceResp, 1);
+            }
+        }
+
+        function createResourceResp(count, ret){
+            document.getElementById("taInput").value = ret;
+            var JSONobj = JSON.parse(ret);
+            alert(JSONobj.resourceType + " resource creation success! ID: " + JSONobj.id);
+        }  
+
+    </script>
+</body>
+
+</html>
