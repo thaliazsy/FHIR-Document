@@ -25,11 +25,10 @@
 </head>
 
 <body style="height: 780px">
-    
-<br><br>
     <table id ="myTable">
         <tr>
             <td colspan="3">
+                Resource ID: <input id="resourceID" type="text" value="" /><br>
                 <input id="btnCreate" onclick="createResource()" type="button" value="Create Resource" />
             </td>
         </tr>
@@ -447,6 +446,7 @@
             document.getElementById("taInput").value = ret;
             var JSONobj = JSON.parse(ret);
             alert(JSONobj.resourceType + " resource creation success! ID: " + JSONobj.id);
+            document.getElementById("resourceID").value = JSONobj.id;
         }  
 
     </script>
