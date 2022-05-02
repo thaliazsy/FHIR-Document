@@ -28,8 +28,14 @@
     <table id ="myTable">
         <tr>
             <td colspan="3">
-                Resource ID: <input id="resourceID" type="text" value="" /><br>
+                <select name="resourceType" id="resourceType">
+                    <option value="Patient">Patient</option>
+                    <option value="ImagingStudy">ImagingStudy</option>
+                    <option value="Observation">Observation</option>
+                  </select>
+                Resource ID: <input id="resourceID" type="text" value="" enable /><br> 
                 <input id="btnCreate" onclick="createResource()" type="button" value="Create Resource" />
+                <input id="btnSearch" onclick="searchResource()" type="button" value="Search Resource" />
             </td>
         </tr>
         <tr>
@@ -162,12 +168,6 @@
             
         var Ann = {
             "resourceType": "Observation",
-            "id": "769",
-            "meta": {
-                "versionId": "1",
-                "lastUpdated": "2020-12-18T14:46:43.884+00:00",
-                "source": "#AwjuoO2vWZR2JbBj"
-            },
             "identifier": [
                 {
                 "system": "http://127.0.0.1:5500/MedicalImagingExamWorkflow/systemA.html",
@@ -441,12 +441,31 @@
             HTTPPostData(apiURL, dataString, createResourceResp, 1);
             }
         }
+        function searchResource(){
+            var resourceID = document.getElementById("resourceID").value;
+            var resourceType = document.getElementById("resourceType").value;
+            if(resourceID!=null){
+                var apiURL = FHIRrootURL + '/' + resourceType + '/' + resourceID;
+                HTTPGetData(apiURL, getResourceResp, 1);
+            }
+            else {
+                alert("Please fill up the resourceID!")
+            }
+        }
 
         function createResourceResp(count, ret){
             document.getElementById("taInput").value = ret;
             var JSONobj = JSON.parse(ret);
-            alert(JSONobj.resourceType + " resource creation success! ID: " + JSONobj.id);
             document.getElementById("resourceID").value = JSONobj.id;
+            document.getElementById("resourceType").value = JSONobj.resourceType;
+            alert(JSONobj.resourceType + " resource creation success! ID: " + JSONobj.id);
+        } 
+        function getResourceResp(count, ret){
+            document.getElementById("taInput").value = ret;
+            var JSONobj = JSON.parse(ret);
+            document.getElementById("resourceID").value = JSONobj.id;
+            //document.getElementById("resourceType").value = JSONobj.resourceType;
+            alert(JSONobj.resourceType + " resource get success! ID: " + JSONobj.id);
         }  
 
     </script>
