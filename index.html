@@ -122,7 +122,7 @@
             HTTPGetData("composition-sample.json", manageResponseRet, 4);
         }
 
-        function manageResponseRet(count, ret) { // alert(ret);
+        function manageResponseRet(count, ret) {
             if(count === 1 ){
                 //display Immunization resource
                 document.getElementById("taImmun").value = ret;
@@ -144,7 +144,7 @@
             else if(count === 2){
                 //display Patient resource
                 document.getElementById("taPatient").value = ret;
-
+                
                 if(JSON.parse(ret).resourceType != "Patient"){
                     alert("Patient not found!");
                 }
@@ -178,10 +178,8 @@
                 }
             }
             else if(count === 4){
-                //display Composition resource template
-                //document.getElementById("taComp").value = ret;
                 var compObj = JSON.parse(ret);
-
+                
                 //get immunization date
                 var immunObj = JSON.parse(localStorage.getItem("fhirImmun"));
                 var date = immunObj.occurrenceDateTime;
@@ -209,8 +207,6 @@
                 HTTPGetData("document-sample.json", manageResponseRet, 6);
             }
             else if(count === 6){
-                //display Document resource template
-                //document.getElementById("taDoc").value = ret;
                 var docObj = JSON.parse(ret);
 
                 //create FHIR Document
